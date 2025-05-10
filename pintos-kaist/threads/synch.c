@@ -174,14 +174,13 @@ lock_init (struct lock *lock) {
 	sema_init (&lock->semaphore, 1);
 }
 
-/* Acquires LOCK, sleeping until it becomes available if
-   necessary.  The lock must not already be held by the current
-   thread.
-
-   This function may sleep, so it must not be called within an
-   interrupt handler.  This function may be called with
-   interrupts disabled, but interrupts will be turned back on if
-   we need to sleep. */
+/* 필요한 경우 잠들면서 LOCK을 획득한다
+   이 락은 현재 스레드가 이미 보유하고 있어서는 안된다.
+   
+   이 함수는 잠들 수 있기 때문에, 
+   인터럽트 핸들러 내부에서 호출해서는 안된다.
+   인터럽트가 비활성된 상태에서 호출될 수는 있지만,
+   슬립이 필요하면 인터럽트는 다시 활성화된다. */
 void
 lock_acquire (struct lock *lock) {
 	ASSERT (lock != NULL);
@@ -211,12 +210,11 @@ lock_try_acquire (struct lock *lock) {
 	return success;
 }
 
-/* Releases LOCK, which must be owned by the current thread.
-   This is lock_release function.
-
-   An interrupt handler cannot acquire a lock, so it does not
-   make sense to try to release a lock within an interrupt
-   handler. */
+/* LOCK을 해제한다. 이 락은 현재 스레드가 보유하고 있어야 한다.
+   이 함수는 lock_release 함수이다.
+   
+   인터럽트 핸들러는 락을 획득할 수 없기 때문에,
+   인터럽트 핸들러 내에서 락을 해제하려는 시도는 의미가 없다. */
 void
 lock_release (struct lock *lock) {
 	ASSERT (lock != NULL);

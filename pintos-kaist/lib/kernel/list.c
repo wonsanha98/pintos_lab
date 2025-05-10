@@ -196,8 +196,8 @@ list_push_front (struct list *list, struct list_elem *elem) {
 	list_insert (list_begin (list), elem);
 }
 
-/* Inserts ELEM at the end of LIST, so that it becomes the
-   back in LIST. */
+/* ELEM을 LIST의 끝(back)에 삽입하여,
+   LIST의 맨 뒤 요소가 되도록한다 */
 void
 list_push_back (struct list *list, struct list_elem *elem) {
 	list_insert (list_end (list), elem);
@@ -245,8 +245,8 @@ list_remove (struct list_elem *elem) {
 	return elem->next;
 }
 
-/* Removes the front element from LIST and returns it.
-   Undefined behavior if LIST is empty before removal. */
+/* LIST의 맨 앞(front)요소를 제거하고 반환한다.
+   제거 전에 LIST가 비어 있다면, 동작은 정의되지 않는다. */
 struct list_elem *
 list_pop_front (struct list *list) {
 	struct list_elem *front = list_front (list);

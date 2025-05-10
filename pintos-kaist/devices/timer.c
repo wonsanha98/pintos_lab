@@ -88,13 +88,14 @@ timer_elapsed (int64_t then) {
 }
 
 /* Suspends execution for approximately TICKS timer ticks. */
+//시간 슬립을 호출하는 프로세스는 준비 상태와 실행 상태 사이를 전환한다.
 void
 timer_sleep (int64_t ticks) {
-	int64_t start = timer_ticks ();
+	int64_t start = timer_ticks ();//timer_sleep이 호출되면 현재 시간을 기록
 
 	ASSERT (intr_get_level () == INTR_ON);
 	while (timer_elapsed (start) < ticks)
-		thread_yield ();
+		thread_yield ();	//실행 상태로 전환, 경과 시간이 ticks보다 작으면 CPU를 다시 해제
 }
 
 /* Suspends execution for approximately MS milliseconds. */
