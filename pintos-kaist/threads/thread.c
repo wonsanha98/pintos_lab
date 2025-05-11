@@ -28,6 +28,8 @@
    실행할 준비는 되었지만 실제로 실행 중은 아닌 프로세스들 */
 static struct list ready_list;
 
+static struct list sleep_list;		//추가++
+
 /* Idle thread. */
 static struct thread *idle_thread;
 
@@ -62,6 +64,8 @@ static void init_thread (struct thread *, const char *name, int priority);
 static void do_schedule(int status);
 static void schedule (void);
 static tid_t allocate_tid (void);
+
+void thread_sleep (int64_t getuptick); //++ 추가
 
 /* 메크로, t가 유효한 스레드를 가리키면 true를 반환한다. */
 #define is_thread(t) ((t) != NULL && (t)->magic == THREAD_MAGIC) //t의 magic 멤버가 THREAD_MAGIC 과 같다면
@@ -101,6 +105,8 @@ thread_init (void) {
 	lock_init (&tid_lock);			
 	list_init (&ready_list);
 	list_init (&destruction_req);
+	list_init (&sleep_list);
+	tick = -1;
 
 	/* 현재 실행 중인 스레드를 위한 스레드 구조체를 설정한다 */
 	initial_thread = running_thread ();					//초기 스레드를 실행중인 스레드로 한다?
@@ -280,6 +286,46 @@ thread_exit (void) {
 	NOT_REACHED ();				//도달하지 않음??
 }
 
+void
+thread_sleep (int64_t getuptick) 
+{
+	struct thread *curr = thread_current (); //현재 스레드 대한 포인터
+	enum intr_level old_level;
+
+	ASSERT (!intr_context ());	//외부 인터럽트를 처리하는 중일 때는 true를 반환하고, 그 외의 모든 시간에는 false를 반환
+
+	old_level = intr_disable (); //스레드를 비활성화
+	if (curr != idle_thread)
+	{
+		curr->getuptick = getuptick;
+		list_push_back (&sleep_list, &curr->elem); //현재 스레드 구조를 ready_list 목록의 끝에 넣는다.
+		if(tick == -1)
+		{
+			tick = curr->getuptick;
+		}
+	}
+
+	do_schedule (THREAD_BLOCKED); //현재 실행 중인 스레드의 상태를 준비상태로
+	//schedule(); contact switch를 호출?
+	intr_set_level (old_level); //인터럽트 수준을 원래 상태로 설정한다.
+}
+
+void wakeup(int64_t ticks)
+{
+	if(list_empty(&sleep_list))
+	{
+		return;
+	}
+
+	if(tick <= ticks)
+	{
+		struct thread *curr = list_entry(list_pop_front(&sleep_list), struct thread, elem);
+		curr->status = THREAD_READY;
+		list_push_back(&ready_list, &curr->elem);
+		tick = list_entry (list_head (&sleep_list), struct thread, elem)->getuptick;
+	}
+}
+
 /* CPU를 양보한다.
    현재 스레드는 슬립 상태로 전환되지 않으며, 
    스케줄러의 판단에 따라 즉시 다시 스케줄될 수도 있다. */
@@ -401,6 +447,7 @@ init_thread (struct thread *t, const char *name, int priority) {
 	t->tf.rsp = (uint64_t) t + PGSIZE - sizeof (void *); //??? 뭐를 하려고 하는가..
 	t->priority = priority;	// 인자로 받은 priority를 t의 priority에 대입한다.
 	t->magic = THREAD_MAGIC;// t의 magic을 THREAD_MAGIC을 대입
+	t->getuptick = 0;
 }
 
 /* 다음에 스케줄될 스레드를 선택하여 반환한다.

@@ -4,27 +4,45 @@ Kernel command line: -q -mlfqs run mlfqs-nice-10
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0x13e0000 (Usable: 19,328 kB)
-Calibrating timer...  215,859,200 loops/s.
+Calibrating timer...  261,734,400 loops/s.
 Boot complete.
 Executing 'mlfqs-nice-10':
 (mlfqs-nice-10) begin
 (mlfqs-nice-10) Starting 10 threads...
 (mlfqs-nice-10) Starting threads took 1 ticks.
 (mlfqs-nice-10) Sleeping 40 seconds to let threads run, please wait...
-(mlfqs-nice-10) Thread 0 received 301 ticks.
-(mlfqs-nice-10) Thread 1 received 301 ticks.
-(mlfqs-nice-10) Thread 2 received 301 ticks.
-(mlfqs-nice-10) Thread 3 received 300 ticks.
-(mlfqs-nice-10) Thread 4 received 301 ticks.
-(mlfqs-nice-10) Thread 5 received 301 ticks.
-(mlfqs-nice-10) Thread 6 received 301 ticks.
-(mlfqs-nice-10) Thread 7 received 301 ticks.
-(mlfqs-nice-10) Thread 8 received 300 ticks.
-(mlfqs-nice-10) Thread 9 received 301 ticks.
+(mlfqs-nice-10) Thread 0 received 0 ticks.
+(mlfqs-nice-10) Thread 1 received 0 ticks.
+(mlfqs-nice-10) Thread 2 received 0 ticks.
+(mlfqs-nice-10) Thread 3 received 0 ticks.
+(mlfqs-nice-10) Thread 4 received 0 ticks.
+(mlfqs-nice-10) Thread 5 received 0 ticks.
+(mlfqs-nice-10) Thread 6 received 0 ticks.
+(mlfqs-nice-10) Thread 7 received 0 ticks.
+(mlfqs-nice-10) Thread 8 received 0 ticks.
+(mlfqs-nice-10) Thread 9 received 0 ticks.
 (mlfqs-nice-10) end
 Execution of 'mlfqs-nice-10' complete.
-Timer: 4051 ticks
-Thread: 0 idle ticks, 4051 kernel ticks, 0 user ticks
-Console: 1040 characters output
-Keyboard: 0 keys pressed
-Powering off...
+Timer: 4040 ticks
+Thread: 4000 idle ticks, 41 kernel ticks, 0 user ticks
+Console: 1021 charactersInterrupt 0x0e (#PF Page-Fault Exception) at rip=7304000e24
+ cr2=0000007304000e24 error=               0
+rax 0000000000000000 rbx 0000000000204400 rcx 00000080040b8000 rdx 00000000000003d4
+rsp 0000008004000e80 rbp 0000008004000f2c rsi 000000000000990f rdi 0000000000000001
+rip 0000007304000e24 r8 0000008004000ec8  r9 00000080042166d5 r10 0000000000000000
+r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000000
+r15 0000000000000000 rflags 00200202
+es: 0010 ds: 0010 cs: 0008 ss: 0010
+Kernel PANIC at ../../threads/interrupt.c:361 in intr_handler(): Unexpected interrupt
+Call stack: 0x80042133ed 0x8004208967 0x8004208d19 0x42108f000000080Interrupt 0x0d (#GP General Protection Exception) at rip=8004210427
+ cr2=0000007304000e24 error=               0
+rax 04000fa000000018 rbx 0000000000204400 rcx 00000080040b8000 rdx 00000000000003d4
+rsp 0000008004000cf0 rbp 0000008004000d00 rsi 000000000000c40f rdi 0000000000000000
+rip 0000008004210427 r8 0000008004000c08  r9 00000080042166d5 r10 0000000000000000
+r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000000
+r15 0000000000000000 rflags 00200006
+es: 0010 ds: 0010 cs: 0008 ss: 0010
+Kernel PANIC recursion at ../../threads/interrupt.c:361 in intr_handler().
+Timer: 4050 ticks
+Thread: 4000 idle ticks, 50 kernel ticks, 0 user ticks
+Console: 2
