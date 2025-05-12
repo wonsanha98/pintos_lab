@@ -29,6 +29,8 @@
 static struct list ready_list;
 
 static struct list sleep_list;		//추가++
+int64_t global_tick = 0;			//추가++
+
 
 /* Idle thread. */
 static struct thread *idle_thread;
@@ -66,6 +68,8 @@ static void schedule (void);
 static tid_t allocate_tid (void);
 
 void thread_sleep (int64_t getuptick); //++ 추가
+bool sleep(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED); //++추가
+
 
 /* 메크로, t가 유효한 스레드를 가리키면 true를 반환한다. */
 #define is_thread(t) ((t) != NULL && (t)->magic == THREAD_MAGIC) //t의 magic 멤버가 THREAD_MAGIC 과 같다면
@@ -106,7 +110,6 @@ thread_init (void) {
 	list_init (&ready_list);
 	list_init (&destruction_req);
 	list_init (&sleep_list);
-	tick = -1;
 
 	/* 현재 실행 중인 스레드를 위한 스레드 구조체를 설정한다 */
 	initial_thread = running_thread ();					//초기 스레드를 실행중인 스레드로 한다?
@@ -279,7 +282,7 @@ thread_exit (void) {
 	process_exit ();
 #endif
 
-	/* J상태를 dying으로 설정하고, 다른 프로세스를 스케줄링하기만 하면 된다.
+	/* 상태를 dying으로 설정하고, 다른 프로세스를 스케줄링하기만 하면 된다.
 	   현재 스레드는 schedule_tail() 호출 중에 파괴(destroy)될 것이다. */
 	intr_disable ();			//인터럽트 비활성화, 이전 인터럽트 상태를 반환 받음
 	do_schedule (THREAD_DYING);	//THREAD_DYING으로 스케줄을 한다?
@@ -287,43 +290,66 @@ thread_exit (void) {
 }
 
 void
-thread_sleep (int64_t getuptick) 
+thread_sleep (int64_t getupticks) 
 {
-	struct thread *curr = thread_current (); //현재 스레드 대한 포인터
+	 //현재 스레드 대한 포인터
+	struct thread *curr = thread_current ();
 	enum intr_level old_level;
 
 	ASSERT (!intr_context ());	//외부 인터럽트를 처리하는 중일 때는 true를 반환하고, 그 외의 모든 시간에는 false를 반환
 
-	old_level = intr_disable (); //스레드를 비활성화
-	if (curr != idle_thread)
+	old_level = intr_disable (); //인터럽트 비활성화
+	if (curr != idle_thread)		//현재 쓰레드가 idle_thread가 아니라면
 	{
-		curr->getuptick = getuptick;
-		list_push_back (&sleep_list, &curr->elem); //현재 스레드 구조를 ready_list 목록의 끝에 넣는다.
-		if(tick == -1)
-		{
-			tick = curr->getuptick;
-		}
+		// curr->status = THREAD_BLOCKED;							//현재 쓰레드를 BLOCKED로 변경
+		curr->getuptick = getupticks;								//깨어날 시간을 getupick으로 저장
+		list_insert_ordered(&sleep_list, &curr->elem, sleep, NULL);
+		struct thread *target = list_entry(list_begin(&sleep_list), struct thread, elem); //리스트에 정렬 삽입
+		global_tick = target->getuptick;
+		thread_block();
 	}
-
-	do_schedule (THREAD_BLOCKED); //현재 실행 중인 스레드의 상태를 준비상태로
-	//schedule(); contact switch를 호출?
 	intr_set_level (old_level); //인터럽트 수준을 원래 상태로 설정한다.
+	// schedule (); 
 }
 
-void wakeup(int64_t ticks)
+void wakeup()
 {
 	if(list_empty(&sleep_list))
 	{
 		return;
 	}
 
-	if(tick <= ticks)
+	enum intr_level old_level;
+	old_level = intr_disable (); //인터럽트 비활성화	
+	
+	struct list_elem *start = list_begin(&sleep_list);
+
+	while(start != list_end(&sleep_list))
 	{
-		struct thread *curr = list_entry(list_pop_front(&sleep_list), struct thread, elem);
-		curr->status = THREAD_READY;
-		list_push_back(&ready_list, &curr->elem);
-		tick = list_entry (list_head (&sleep_list), struct thread, elem)->getuptick;
+		struct thread *start_thread = list_entry(start, struct thread, elem);
+		if(start_thread->getuptick <= global_tick)
+		{
+			struct list_elem *next = start->next;
+			list_pop_front (&sleep_list);
+			thread_unblock(start_thread);
+			start = next;
+		}
+		else
+		{
+			break;
+		}
+	}	
+
+	if(!list_empty(&sleep_list))
+	{
+		global_tick = list_entry(start, struct thread, elem)->getuptick;
+	}	
+	else
+	{
+		global_tick = 0;
 	}
+
+	intr_set_level (old_level); //인터럽트 수준을 원래 상태로 설정한다.
 }
 
 /* CPU를 양보한다.
@@ -337,7 +363,7 @@ thread_yield (void) {
 
 	ASSERT (!intr_context ());	//외부 인터럽트를 처리하는 중일 때는 true를 반환하고, 그 외의 모든 시간에는 false를 반환
 
-	old_level = intr_disable (); //스레드를 비활성화
+	old_level = intr_disable (); //인터럽트 비활성화
 	if (curr != idle_thread)
 		list_push_back (&ready_list, &curr->elem); //현재 스레드 구조를 ready_list 목록의 끝에 넣는다.
 	do_schedule (THREAD_READY); //현재 실행 중인 스레드의 상태를 준비상태로
@@ -638,4 +664,13 @@ allocate_tid (void) {
 	//의문점은 tid는 숫자 하나씩 증가를 해야하는 거아닌가?
 	//이 상태로 진행된다면 무조건 1서 하나 증가한 값으로 할당되는 것으로 보이는데...
 	return tid;					
+}
+
+
+bool sleep(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
+{
+	struct thread *a_thread = list_entry(a, struct thread, elem);
+	struct thread *b_thread = list_entry(b, struct thread, elem);
+	
+	return 	a_thread->getuptick < b_thread->getuptick;
 }

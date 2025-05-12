@@ -91,7 +91,7 @@ struct thread {							//thread 구조체
 	enum thread_status status;          /* Thread state. */
 	char name[16];                      /* Name (for debugging purposes). */
 	int priority;                       /* Priority. */
-	int64_t getuptick;
+	int64_t getuptick;					// 일어날 시간
 	/* Shared between thread.c and synch.c. */
 	struct list_elem elem;              /* List element. */
 
@@ -117,7 +117,6 @@ extern bool thread_mlfqs;
 
 void thread_init (void);
 void thread_start (void);
-int64_t tick;			//글로벌 틱
 
 void thread_tick (void);
 void thread_print_stats (void);

@@ -96,8 +96,10 @@ timer_sleep (int64_t ticks) {
 
 	ASSERT(intr_get_level() == INTR_ON);
 	if(timer_elapsed (start) < ticks)
+	{
 		thread_sleep (start + ticks);	//실행 상태로 전환, 경과 시간이 ticks보다 작으면 CPU를 다시 해제
-}
+	}
+}//깨울 시간으로 thread_sleep을 호출한다.
 
 /* Suspends execution for approximately MS milliseconds. */
 void
@@ -127,13 +129,8 @@ timer_print_stats (void) {
 static void
 timer_interrupt (struct intr_frame *args UNUSED) {
 	ticks++;
-
 	thread_tick ();
-	if(tick == -1)
-	{
-		return;
-	}
-	wakeup(timer_ticks());
+	wakeup();
 }
 
 

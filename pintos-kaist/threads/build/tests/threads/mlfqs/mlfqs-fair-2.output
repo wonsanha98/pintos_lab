@@ -4,31 +4,32 @@ Kernel command line: -q -mlfqs run mlfqs-fair-2
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0x13e0000 (Usable: 19,328 kB)
-Calibrating timer...  215,859,200 loops/s.
+Calibrating timer...  228,556,800 loops/s.
 Boot complete.
 Executing 'mlfqs-fair-2':
 (mlfqs-fair-2) begin
 (mlfqs-fair-2) Starting 2 threads...
 (mlfqs-fair-2) Starting threads took 0 ticks.
 (mlfqs-fair-2) Sleeping 40 seconds to let threads run, please wait...
-(mlfqs-fair-2) Thread 0 received 0 ticks.
-(mlfqs-fair-2) Thread 1 received 0 ticks.
+(mlfqs-fair-2) Thread 0 received 4 ticks.
+(mlfqs-fair-2) Thread 1 received 4 ticks.
 (mlfqs-fair-2) end
 Execution of 'mlfqs-fair-2' complete.
-Timer: 4033 ticks
-Thread: 4000 idle ticks, 33 kernel tickInterrupt 0x0e (#PF Page-Fault Exception) at rip=8004208d72
+Timer: 40 ticks
+Thread: 1 idle ticks, 39 kernel ticks, 0 user ticks
+Console: 661 charactersInterrupt 0x0e (#PF Page-Fault Exception) at rip=8004208e41
  cr2=0000000000000010 error=               0
-rax 0000000000000000 rbx 0000000000204400 rcx 000000000000006b rdx 00000000000003f9
-rsp 0000008004000db8 rbp 0000008004000df0 rsi 0000000000000003 rdi 0000000000000001
-rip 0000008004208d72 r8 0000008004000ec8  r9 00000080042166d5 r10 0000000000000000
+rax 0000000000000000 rbx 0000000000204400 rcx 00000080040b8000 rdx 00000000000003d4
+rsp 0000008004000db8 rbp 0000008004000df0 rsi 000000000000970f rdi 0000000000000001
+rip 0000008004208e41 r8 0000008004000ec8  r9 0000008004216780 r10 0000000000000000
 r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000000
 r15 0000000000000000 rflags 00200006
 es: 0010 ds: 0010 cs: 0008 ss: 0010
 Kernel PANIC at ../../threads/interrupt.c:361 in intr_handler(): Unexpected interrupt
-Call stack: 0x80042133ed 0x8004208967 0x8004208d19 0x8004207a7b 0x800420e05a 0x80042167a1 0x8004216712 0x8004210939 0x80042165c1 0x80042108f0 0x8004206b05 0x8004206827 0x80042067dd 0x800420613d.
+Call stack: 0x8004213498 0x8004208a36 0x8004208de8 0x8004207b4a 0x800420db81 0x800421685e 0x80042167bd 0x80042109e4 0x800421666c 0x800421099b 0x80042164e5 0x8004206833 0x80042067dd 0x800420613d.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 4042 ticks
-Thread: 4000 idle ticks, 42 kernel ticks, 0 user ticks
+Timer: 50 ticks
+Thread: 1 idle ticks, 49 kernel ticks, 0 user ticks
 Console: 1

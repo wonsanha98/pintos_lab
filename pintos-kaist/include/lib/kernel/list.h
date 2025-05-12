@@ -140,9 +140,9 @@ bool list_empty (struct list *);
 /* Miscellaneous. */
 void list_reverse (struct list *);
 
-/* Compares the value of two list elements A and B, given
-   auxiliary data AUX.  Returns true if A is less than B, or
-   false if A is greater than or equal to B. */
+/* 보조 데이터 AUX가 주어지면 두 리스트 요소 A와 B의 값을 비교한다.
+   A가 B의 값보다 작으면 true를 반환하고, A가 B보다 작으면 ture를 반환하고,
+   A가 B보다 작으면 ture를 반환하고, A가 B보다 크거나 같으면 false를 반환한다. */
 typedef bool list_less_func (const struct list_elem *a,
                              const struct list_elem *b,
                              void *aux);
