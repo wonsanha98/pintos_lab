@@ -4,49 +4,37 @@ Kernel command line: -q -mlfqs run mlfqs-fair-20
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0x13e0000 (Usable: 19,328 kB)
-Calibrating timer...  222,412,800 loops/s.
+Calibrating timer...  225,689,600 loops/s.
 Boot complete.
 Executing 'mlfqs-fair-20':
 (mlfqs-fair-20) begin
 (mlfqs-fair-20) Starting 20 threads...
-(mlfqs-fair-20) Starting threads took 0 ticks.
+(mlfqs-fair-20) Starting threads took 1 ticks.
 (mlfqs-fair-20) Sleeping 40 seconds to let threads run, please wait...
-(mlfqs-fair-20) Thread 0 received 4 ticks.
-(mlfqs-fair-20) Thread 1 received 4 ticks.
-(mlfqs-fair-20) Thread 2 received 4 ticks.
-(mlfqs-fair-20) Thread 3 received 8 ticks.
-(mlfqs-fair-20) Thread 4 received 8 ticks.
-(mlfqs-fair-20) Thread 5 received 8 ticks.
-(mlfqs-fair-20) Thread 6 received 8 ticks.
-(mlfqs-fair-20) Thread 7 received 8 ticks.
-(mlfqs-fair-20) Thread 8 received 12 ticks.
-(mlfqs-fair-20) Thread 9 received 12 ticks.
-(mlfqs-fair-20) Thread 10 received 16 ticks.
-(mlfqs-fair-20) Thread 11 received 16 ticks.
-(mlfqs-fair-20) Thread 12 received 16 ticks.
-(mlfqs-fair-20) Thread 13 received 16 ticks.
-(mlfqs-fair-20) Thread 14 received 16 ticks.
-(mlfqs-fair-20) Thread 15 received 16 ticks.
-(mlfqs-fair-20) Thread 16 received 16 ticks.
-(mlfqs-fair-20) Thread 17 received 16 ticks.
-(mlfqs-fair-20) Thread 18 received 16 ticks.
-(mlfqs-fair-20) Thread 19 received 20 ticks.
+(mlfqs-fair-20) Thread 0 received 153 ticks.
+(mlfqs-fair-20) Thread 1 received 152 ticks.
+(mlfqs-fair-20) Thread 2 received 153 ticks.
+(mlfqs-fair-20) Thread 3 received 153 ticks.
+(mlfqs-fair-20) Thread 4 received 153 ticks.
+(mlfqs-fair-20) Thread 5 received 153 ticks.
+(mlfqs-fair-20) Thread 6 received 153 ticks.
+(mlfqs-fair-20) Thread 7 received 152 ticks.
+(mlfqs-fair-20) Thread 8 received 153 ticks.
+(mlfqs-fair-20) Thread 9 received 153 ticks.
+(mlfqs-fair-20) Thread 10 received 148 ticks.
+(mlfqs-fair-20) Thread 11 received 149 ticks.
+(mlfqs-fair-20) Thread 12 received 148 ticks.
+(mlfqs-fair-20) Thread 13 received 149 ticks.
+(mlfqs-fair-20) Thread 14 received 149 ticks.
+(mlfqs-fair-20) Thread 15 received 148 ticks.
+(mlfqs-fair-20) Thread 16 received 149 ticks.
+(mlfqs-fair-20) Thread 17 received 148 ticks.
+(mlfqs-fair-20) Thread 18 received 149 ticks.
+(mlfqs-fair-20) Thread 19 received 149 ticks.
 (mlfqs-fair-20) end
 Execution of 'mlfqs-fair-20' complete.
-Timer: 451 ticks
-Interrupt 0x0e (#PF Page-Fault Exception) at rip=8004208e41
- cr2=0000000000000010 error=               0
-rax 0000000000000000 rbx 0000000000204400 rcx 00000080040b8000 rdx 00000000000003d4
-rsp 0000008004000db8 rbp 0000008004000df0 rsi 000000000000800f rdi 0000000000000001
-rip 0000008004208e41 r8 0000008004000ec8  r9 0000008004216780 r10 0000000000000000
-r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000000
-r15 0000000000000000 rflags 00200006
-es: 0010 ds: 0010 cs: 0008 ss: 0010
-Kernel PANIC at ../../threads/interrupt.c:361 in intr_handler(): Unexpected interrupt
-Call stack: 0x8004213498 0x8004208a36 0x8004208de8 0x8004207b4e 0x800420db85 0x8004216862 0x80042167c1 0x80042109e8 0x8004216670 0x800421099b 0x800420d21c 0x800420681b 0x80042067dd 0x800420613d.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 532 ticks
-Thread: 1 idle ticks, 531 kernel ticks, 0 user ticks
-Console: 2
+Timer: 4038 ticks
+Thread: 1000 idle ticks, 3038 kernel ticks, 0 user ticks
+Console: 1503 characters output
+Keyboard: 0 keys pressed
+Powering off...

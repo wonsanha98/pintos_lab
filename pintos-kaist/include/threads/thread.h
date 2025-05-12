@@ -114,6 +114,7 @@ struct thread {							//thread 구조체
    If true, use multi-level feedback queue scheduler.
    Controlled by kernel command-line option "-o mlfqs". */
 extern bool thread_mlfqs;
+int64_t global_tick;
 
 void thread_init (void);
 void thread_start (void);

@@ -29,7 +29,6 @@
 static struct list ready_list;
 
 static struct list sleep_list;		//추가++
-int64_t global_tick = 0;			//추가++
 
 
 /* Idle thread. */
@@ -110,6 +109,8 @@ thread_init (void) {
 	list_init (&ready_list);
 	list_init (&destruction_req);
 	list_init (&sleep_list);
+	global_tick = INT64_MAX;			//추가++
+
 
 	/* 현재 실행 중인 스레드를 위한 스레드 구조체를 설정한다 */
 	initial_thread = running_thread ();					//초기 스레드를 실행중인 스레드로 한다?
@@ -301,7 +302,6 @@ thread_sleep (int64_t getupticks)
 	old_level = intr_disable (); //인터럽트 비활성화
 	if (curr != idle_thread)		//현재 쓰레드가 idle_thread가 아니라면
 	{
-		// curr->status = THREAD_BLOCKED;							//현재 쓰레드를 BLOCKED로 변경
 		curr->getuptick = getupticks;								//깨어날 시간을 getupick으로 저장
 		list_insert_ordered(&sleep_list, &curr->elem, sleep, NULL);
 		struct thread *target = list_entry(list_begin(&sleep_list), struct thread, elem); //리스트에 정렬 삽입
@@ -309,7 +309,6 @@ thread_sleep (int64_t getupticks)
 		thread_block();
 	}
 	intr_set_level (old_level); //인터럽트 수준을 원래 상태로 설정한다.
-	// schedule (); 
 }
 
 void wakeup()
@@ -346,7 +345,7 @@ void wakeup()
 	}	
 	else
 	{
-		global_tick = 0;
+		global_tick = INT64_MAX;
 	}
 
 	intr_set_level (old_level); //인터럽트 수준을 원래 상태로 설정한다.
