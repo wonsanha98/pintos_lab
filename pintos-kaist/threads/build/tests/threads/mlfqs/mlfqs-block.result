@@ -1,2 +1,12 @@
 FAIL
-Run didn't shut down properly: no "Powering off" message
+Kernel panic in run: PANIC at ../../threads/interrupt.c:361 in intr_handler(): Unexpected interrupt
+Call stack: 0x80042136da 0x8004208b4a 0x8004208efc 0x8004210bdd 0x8004216727 0x8004206833 0x80042067dd 0x800420613d
+Translation of call stack:
+0x00000080042136da: debug_panic (lib/kernel/debug.c:32)
+0x0000008004208b4a: intr_handler (threads/interrupt.c:365)
+0x0000008004208efc: intr_entry (threads/intr-stubs.o:?)
+0x0000008004210bdd: printf (lib/stdio.c:80)
+0x0000008004216727: console_print_stats (lib/kernel/console.c:81)
+0x0000008004206833: print_stats (threads/init.c:361)
+0x00000080042067dd: power_off (threads/init.c:347)
+0x000000800420613d: main (threads/init.c:127)

@@ -387,8 +387,8 @@ thread_set_priority (int new_priority) {
  	curr_thread->priority = new_priority;
 	if(!list_empty(&ready_list))
 	{
-		struct thread *forst_thread = list_entry(list_begin(&ready_list), struct thread, elem);
-		if(curr_thread->priority < forst_thread->priority)
+		struct thread *first_thread = list_entry(list_begin(&ready_list), struct thread, elem);
+		if(curr_thread->priority < first_thread->priority)
 		{
 			thread_yield();
 		}
