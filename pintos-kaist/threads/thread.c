@@ -68,8 +68,7 @@ static tid_t allocate_tid (void);
 
 void thread_sleep (int64_t getuptick); //++ 추가
 bool sleep(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED); //++추가
-
-
+bool ready_sort(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED); //++추가
 /* 메크로, t가 유효한 스레드를 가리키면 true를 반환한다. */
 #define is_thread(t) ((t) != NULL && (t)->magic == THREAD_MAGIC) //t의 magic 멤버가 THREAD_MAGIC 과 같다면
 
@@ -181,6 +180,7 @@ tid_t
 thread_create (const char *name, int priority,
 		thread_func *function, void *aux) {
 	struct thread *t;			//thread를 가리키는 포인터 t
+	struct thread *curr = thread_current(); //현재 실행중인 스레드 추가++
 	tid_t tid;					//thread 식별자 tid
 
 	ASSERT (function != NULL);	//function가 존재 안하면 에러??
@@ -207,6 +207,13 @@ thread_create (const char *name, int priority,
 
 	/* 실행 대기 큐(run queue)에 추가한다. */
 	thread_unblock (t);
+	if(curr->priority < t->priority) //현재 실행 중인 스레드와 새로 삽입된 스레드의 우선순위를 비교
+	{
+		thread_yield();					//새로운 스레드의 우선순위가 더 높다면 CPU 양보
+	}
+
+	/* 현재 실행 중인 스레드와 새로 삽입된 스레드의 우선순위를 비교하라.  +++
+   새로 도착한 스레드의 우선순위가 더 높다면 CPU를 양보하라. */
 
 	return tid;					//thread id를 반환
 }
@@ -238,7 +245,10 @@ thread_unblock (struct thread *t) {
 
 	old_level = intr_disable ();		//인터럽트를 비활성화하고, 이전 인터럽트 상태를 반환
 	ASSERT (t->status == THREAD_BLOCKED);//t가 THREAD_BLOCKED 상태라면? ASSERT는 디버그용?
-	list_push_back (&ready_list, &t->elem); //ready_list의 끝에 t->elem을 추가? elem은 prev와 next를 가리키는 구조체
+	// list_push_back (&ready_list, &t->elem); //ready_list의 끝에 t->elem을 추가? elem은 prev와 next를 가리키는 구조체
+	list_insert_ordered(&ready_list, &t->elem, ready_sort, NULL);
+	//list_push_back대신   list_insert_ordered(& ready_list, & t-> elem, cmp_priority, NULL);  사용
+
 	t->status = THREAD_READY;			//t를 THREAD_READY 상태로 변경한다.
 	intr_set_level (old_level);			//이전 인터럽드 상태로 set한다?
 }
@@ -303,10 +313,10 @@ thread_sleep (int64_t getupticks)
 	if (curr != idle_thread)		//현재 쓰레드가 idle_thread가 아니라면
 	{
 		curr->getuptick = getupticks;								//깨어날 시간을 getupick으로 저장
-		list_insert_ordered(&sleep_list, &curr->elem, sleep, NULL);
-		struct thread *target = list_entry(list_begin(&sleep_list), struct thread, elem); //리스트에 정렬 삽입
-		global_tick = target->getuptick;
-		thread_block();
+		list_insert_ordered(&sleep_list, &curr->elem, sleep, NULL);	//리스트에 정렬 삽입
+		struct thread *target = list_entry(list_begin(&sleep_list), struct thread, elem); 
+		global_tick = target->getuptick;							//가장 작은 값을 global_tick으로
+		thread_block();										
 	}
 	intr_set_level (old_level); //인터럽트 수준을 원래 상태로 설정한다.
 }
@@ -321,24 +331,24 @@ void wakeup()
 	enum intr_level old_level;
 	old_level = intr_disable (); //인터럽트 비활성화	
 	
-	struct list_elem *start = list_begin(&sleep_list);
+	struct list_elem *start = list_begin(&sleep_list);				//sleep_list의 가장 앞의 값을 start로 
 
-	while(start != list_end(&sleep_list))
+	while(start != list_end(&sleep_list))							//start가 list의 끝이 아니면
 	{
-		struct thread *start_thread = list_entry(start, struct thread, elem);
-		if(start_thread->getuptick <= global_tick)
+		struct thread *start_thread = list_entry(start, struct thread, elem);//start로 start_thread를 반환
+		if(start_thread->getuptick <= global_tick)							 //global_tick보다 작은 값을 찾는다.
 		{
-			struct list_elem *next = start->next;
-			list_pop_front (&sleep_list);
-			thread_unblock(start_thread);
-			start = next;
+			struct list_elem *next = start->next;							//start의 다음을 next로 저장
+			list_pop_front (&sleep_list);									//최소 값을 삭제
+			thread_unblock(start_thread);									//현재 start_thread를 unblock
+			start = next;													//start에 다음 값을 저장
 		}
 		else
 		{
 			break;
 		}
 	}	
-
+	//global_tick 갱신
 	if(!list_empty(&sleep_list))
 	{
 		global_tick = list_entry(start, struct thread, elem)->getuptick;
@@ -364,16 +374,29 @@ thread_yield (void) {
 
 	old_level = intr_disable (); //인터럽트 비활성화
 	if (curr != idle_thread)
-		list_push_back (&ready_list, &curr->elem); //현재 스레드 구조를 ready_list 목록의 끝에 넣는다.
+	{
+		list_insert_ordered(&ready_list, &curr->elem, ready_sort, NULL);
+	}
+	// list_push_back (&ready_list, &curr->elem); //현재 스레드 구조를 ready_list 목록의 끝에 넣는다.
 	do_schedule (THREAD_READY); //현재 실행 중인 스레드의 상태를 준비상태로
 	//schedule(); contact switch를 호출?
 	intr_set_level (old_level); //인터럽트 수준을 원래 상태로 설정한다.
 }
 
 /* 현재 스레드의 우선순위를 NEW_PRIORITY로 설정한다. */
-void
+void	//수정 ++
 thread_set_priority (int new_priority) {
-	thread_current ()->priority = new_priority;
+	
+	struct thread *curr_thread = thread_current ();
+ 	curr_thread->priority = new_priority;
+	if(!list_empty(&ready_list))
+	{
+		struct thread *forst_thread = list_entry(list_begin(&ready_list), struct thread, elem);
+		if(curr_thread->priority < forst_thread->priority)
+		{
+			thread_yield();
+		}
+	}
 }
 
 /* 현재 스레드의 우선순위를 반환한다. */
@@ -672,4 +695,12 @@ bool sleep(const struct list_elem *a, const struct list_elem *b, void *aux UNUSE
 	struct thread *b_thread = list_entry(b, struct thread, elem);
 	
 	return 	a_thread->getuptick < b_thread->getuptick;
+}
+
+bool ready_sort(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
+{
+	struct thread *a_thread = list_entry(a, struct thread, elem);
+	struct thread *b_thread = list_entry(b, struct thread, elem);
+
+	return a_thread->priority > b_thread->priority;
 }
