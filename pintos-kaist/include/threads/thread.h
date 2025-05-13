@@ -146,4 +146,7 @@ int thread_get_load_avg (void);
 
 void do_iret (struct intr_frame *tf);
 
+bool sort_list(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED); //++추가
+
+
 #endif /* threads/thread.h */

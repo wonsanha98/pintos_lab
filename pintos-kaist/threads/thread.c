@@ -68,7 +68,7 @@ static tid_t allocate_tid (void);
 
 void thread_sleep (int64_t getuptick); //++ 추가
 bool sleep(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED); //++추가
-bool ready_sort(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED); //++추가
+bool sort_list(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED); //++추가
 /* 메크로, t가 유효한 스레드를 가리키면 true를 반환한다. */
 #define is_thread(t) ((t) != NULL && (t)->magic == THREAD_MAGIC) //t의 magic 멤버가 THREAD_MAGIC 과 같다면
 
@@ -246,7 +246,7 @@ thread_unblock (struct thread *t) {
 	old_level = intr_disable ();		//인터럽트를 비활성화하고, 이전 인터럽트 상태를 반환
 	ASSERT (t->status == THREAD_BLOCKED);//t가 THREAD_BLOCKED 상태라면? ASSERT는 디버그용?
 	// list_push_back (&ready_list, &t->elem); //ready_list의 끝에 t->elem을 추가? elem은 prev와 next를 가리키는 구조체
-	list_insert_ordered(&ready_list, &t->elem, ready_sort, NULL);
+	list_insert_ordered(&ready_list, &t->elem, sort_list, NULL);
 	//list_push_back대신   list_insert_ordered(& ready_list, & t-> elem, cmp_priority, NULL);  사용
 
 	t->status = THREAD_READY;			//t를 THREAD_READY 상태로 변경한다.
@@ -375,7 +375,7 @@ thread_yield (void) {
 	old_level = intr_disable (); //인터럽트 비활성화
 	if (curr != idle_thread)
 	{
-		list_insert_ordered(&ready_list, &curr->elem, ready_sort, NULL);
+		list_insert_ordered(&ready_list, &curr->elem, sort_list, NULL);
 	}
 	// list_push_back (&ready_list, &curr->elem); //현재 스레드 구조를 ready_list 목록의 끝에 넣는다.
 	do_schedule (THREAD_READY); //현재 실행 중인 스레드의 상태를 준비상태로
@@ -697,7 +697,7 @@ bool sleep(const struct list_elem *a, const struct list_elem *b, void *aux UNUSE
 	return 	a_thread->getuptick < b_thread->getuptick;
 }
 
-bool ready_sort(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
+bool sort_list(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
 {
 	struct thread *a_thread = list_entry(a, struct thread, elem);
 	struct thread *b_thread = list_entry(b, struct thread, elem);
