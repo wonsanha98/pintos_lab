@@ -38,6 +38,7 @@
 #include "filesys/fsutil.h"
 #endif
 
+
 /* Page-map-level-4 with kernel mappings only. */
 uint64_t *base_pml4;
 
@@ -46,7 +47,7 @@ uint64_t *base_pml4;
 static bool format_filesys;
 #endif
 
-/* -q: Power off after kernel tasks complete? */
+/* -q: 전원을 끄는지 확인 */
 bool power_off_when_done;
 
 bool thread_tests;
@@ -62,48 +63,47 @@ static void usage (void);
 static void print_stats (void);
 
 
-int main (void) NO_RETURN;
+int main (void) NO_RETURN;				//main을 선언한건가? NO_RETURN? debug.h에 정의되어있음
 
 /* Pintos main program. */
 int
 main (void) {
-	uint64_t mem_end;
-	char **argv;
+	uint64_t mem_end;					//64bit 타입으로 보임
+	char **argv;			
 
-	/* Clear BSS and get machine's RAM size. */
+	/* BSS를 지우고 머신의 RAM 크기를 가져온다 */
 	bss_init ();
 
-	/* Break command line into arguments and parse options. */
+	/* 명령줄을 인수로 나누고 옵션을 구문 분석한다 */
 	argv = read_command_line ();
 	argv = parse_options (argv);
 
-	/* Initialize ourselves as a thread so we can use locks,
-	   then enable console locking. */
-	thread_init ();
+	/* 락을 사용할 수 있도록 자신을 스레드로 초기화한 후, 콘솔 락킹을 활성화한다. */
+	thread_init ();						//스레드를 굉장이 초기에 시작하는 것으로 보임. 왜 그럴까?
 	console_init ();
 
-	/* Initialize memory system. */
+	/* 메모리 시스템을 초기화한다 */
 	mem_end = palloc_init ();
-	malloc_init ();
+	malloc_init ();						//malloc 과 paging을 초기화 한 것으로 보임
 	paging_init (mem_end);
 
-#ifdef USERPROG
+#ifdef USERPROG							//유저 프로그램이 정의되어 있으면 해당 부분도 실행?
 	tss_init ();
 	gdt_init ();
 #endif
 
-	/* Initialize interrupt handlers. */
+	/* 인터럽트 핸들러를 초기화 */
 	intr_init ();
-	timer_init ();
+	timer_init ();						//timer.c에 정의 되어 있음
 	kbd_init ();
 	input_init ();
 #ifdef USERPROG
 	exception_init ();
 	syscall_init ();
 #endif
-	/* Start thread scheduler and enable interrupts. */
-	thread_start ();
-	serial_init_queue ();
+	/* 스레드 스케줄러를 시작하고 인터럽트를 활성화한다.*/
+	thread_start ();					//project 1과 관련된 부분이 시작되는 것으로 보임 
+	serial_init_queue ();				//스케줄러 생성?
 	timer_calibrate ();
 
 #ifdef FILESYS
@@ -116,18 +116,18 @@ main (void) {
 	vm_init ();
 #endif
 
-	printf ("Boot complete.\n");
+	printf ("Boot complete.\n");		//부팅이 완료됨을 알림
 
-	/* Run actions specified on kernel command line. */
-	run_actions (argv);
+	/* 커널 명령줄에 지정된 작업들을 실행한다. */
+	run_actions (argv);					//명령을 받아서 동작하는 함수로 보임
 
-	/* Finish up. */
-	if (power_off_when_done)
-		power_off ();
-	thread_exit ();
+	/* 마무리한다. */
+	if (power_off_when_done)			//power_off_when_done은 bool자료형 
+		power_off ();					//전원을 끄는 함수로 보임
+	thread_exit ();						//스레드 종료?
 }
 
-/* Clear BSS */
+/* Clear BSS */ //BSS 영역, 초기화되지 않은 전역 / 정적변수
 static void
 bss_init (void) {
 	/* The "BSS" is a segment that should be initialized to zeros.

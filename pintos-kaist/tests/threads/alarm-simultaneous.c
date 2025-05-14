@@ -1,6 +1,5 @@
-/* Creates N threads, each of which sleeps a different, fixed
-   duration, M times.  Records the wake-up order and verifies
-   that it is valid. */
+/* n개의 스레드를 생성하며, 각 스레드는 서로 다른 고정된 시간(M회)동안 휴면한다
+   웨이크업 순서를 기록하고 유효한지 확인한다. */
 
 #include <stdio.h>
 #include "tests/threads/tests.h"
@@ -21,14 +20,14 @@ test_alarm_simultaneous (void)
 /* Information about the test. */
 struct sleep_test 
   {
-    int64_t start;              /* Current time at start of test. */
-    int iterations;             /* Number of iterations per thread. */
-    int *output_pos;            /* Current position in output buffer. */
+    int64_t start;              /* 테스트 시작 시 현재 시간 */
+    int iterations;             /* 스레드당 반복 횟수 */
+    int *output_pos;            /* 출력 버퍼의 현재 위치 */
   };
 
 static void sleeper (void *);
 
-/* Runs THREAD_CNT threads thread sleep ITERATIONS times each. */
+/* THREAD_CNT 스레드가 ITERATIONS번씩 스레드 절전 모드를 실행한다. */
 static void
 test_sleep (int thread_cnt, int iterations) 
 {
@@ -36,24 +35,24 @@ test_sleep (int thread_cnt, int iterations)
   int *output;
   int i;
 
-  /* This test does not work with the MLFQS. */
+  /* 이 테스트는 MLFQS.와 함께 작동하지 않는다. */
   ASSERT (!thread_mlfqs);
 
   msg ("Creating %d threads to sleep %d times each.", thread_cnt, iterations);
   msg ("Each thread sleeps 10 ticks each time.");
   msg ("Within an iteration, all threads should wake up on the same tick.");
 
-  /* Allocate memory. */
+  /* 메모리를 할당한다. */
   output = malloc (sizeof *output * iterations * thread_cnt * 2);
   if (output == NULL)
     PANIC ("couldn't allocate memory for test");
 
-  /* Initialize test. */
+  /* 테스트를 초기화한다. */
   test.start = timer_ticks () + 100;
   test.iterations = iterations;
   test.output_pos = output;
 
-  /* Start threads. */
+  /* 시작 스레드 */
   ASSERT (output != NULL);
   for (i = 0; i < thread_cnt; i++)
     {
@@ -62,7 +61,7 @@ test_sleep (int thread_cnt, int iterations)
       thread_create (name, PRI_DEFAULT, sleeper, &test);
     }
   
-  /* Wait long enough for all the threads to finish. */
+  /* 모든 스레드가 완료될 때까지 기다린다. */
   timer_sleep (100 + iterations * 10 + 100);
 
   /* Print completion order. */

@@ -63,7 +63,7 @@ list_init (struct list *list) {
 	list->tail.next = NULL;
 }
 
-/* Returns the beginning of LIST.  */
+/* LIST의 시작 지점을 반환한다.  */
 struct list_elem *
 list_begin (struct list *list) {
 	ASSERT (list != NULL);
@@ -196,8 +196,8 @@ list_push_front (struct list *list, struct list_elem *elem) {
 	list_insert (list_begin (list), elem);
 }
 
-/* Inserts ELEM at the end of LIST, so that it becomes the
-   back in LIST. */
+/* ELEM을 LIST의 끝(back)에 삽입하여,
+   LIST의 맨 뒤 요소가 되도록한다 */
 void
 list_push_back (struct list *list, struct list_elem *elem) {
 	list_insert (list_end (list), elem);
@@ -245,8 +245,8 @@ list_remove (struct list_elem *elem) {
 	return elem->next;
 }
 
-/* Removes the front element from LIST and returns it.
-   Undefined behavior if LIST is empty before removal. */
+/* LIST의 맨 앞(front)요소를 제거하고 반환한다.
+   제거 전에 LIST가 비어 있다면, 동작은 정의되지 않는다. */
 struct list_elem *
 list_pop_front (struct list *list) {
 	struct list_elem *front = list_front (list);
@@ -374,9 +374,9 @@ inplace_merge (struct list_elem *a0, struct list_elem *a1b0,
 		}
 }
 
-/* Sorts LIST according to LESS given auxiliary data AUX, using a
-   natural iterative merge sort that runs in O(n lg n) time and
-   O(1) space in the number of elements in LIST. */
+/* LIST를 LESS 함수와 보조 데이터 AUX를 기준으로 정렬한다.
+   자연 반복 병합 정렬(natural iterative merge sort)을 사용하며,
+   LIST의 요소 수에 대해 O(n log n)시간,  O(1) 공간 복잡도로 실행된다. */
 void
 list_sort (struct list *list, list_less_func *less, void *aux) {
 	size_t output_run_cnt;        /* Number of runs output in current pass. */
@@ -412,9 +412,9 @@ list_sort (struct list *list, list_less_func *less, void *aux) {
 	ASSERT (is_sorted (list_begin (list), list_end (list), less, aux));
 }
 
-/* Inserts ELEM in the proper position in LIST, which must be
-   sorted according to LESS given auxiliary data AUX.
-   Runs in O(n) average case in the number of elements in LIST. */
+/* ELEM을 LIST의 적절한 위치에 삽입한다.
+   LIST는 LESS 함수와 보조 데이터 AUX를 기준으로 정렬되어 있어야 한다.
+   이 함수는 LIST 내 요소 수에 대해 평균적으로 O(n)의 시간 복잡도로 실행된다. */
 void
 list_insert_ordered (struct list *list, struct list_elem *elem,
 		list_less_func *less, void *aux) {

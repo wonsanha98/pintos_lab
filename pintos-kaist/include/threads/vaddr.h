@@ -17,7 +17,7 @@
 /* Page offset (bits 0:12). */
 #define PGSHIFT 0                          /* Index of first offset bit. */
 #define PGBITS  12                         /* Number of offset bits. */
-#define PGSIZE  (1 << PGBITS)              /* Bytes in a page. */
+#define PGSIZE  (1 << PGBITS)              /* 한 페이지(page)안에 있는 바이트 수 */
 #define PGMASK  BITMASK(PGSHIFT, PGBITS)   /* Page offset bits (0:12). */
 
 /* Offset within a page. */

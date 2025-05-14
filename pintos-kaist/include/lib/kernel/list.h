@@ -95,11 +95,10 @@ struct list {
 	struct list_elem tail;      /* List tail. */
 };
 
-/* Converts pointer to list element LIST_ELEM into a pointer to
-   the structure that LIST_ELEM is embedded inside.  Supply the
-   name of the outer structure STRUCT and the member name MEMBER
-   of the list element.  See the big comment at the top of the
-   file for an example. */
+/* 리스트 요소 LIST_ELEM에 대한 포인터를, 
+   그 요소가 포함되어 있는 구조체의 포인터로 변환한다.
+   외부 구조체의 이름인 STRUCT와, 리스트 요소의 멤버 이름인 MEMBER를 제공해야 한다.
+   예시는 파일 상단의 주석을 참고 */
 #define list_entry(LIST_ELEM, STRUCT, MEMBER)           \
 	((STRUCT *) ((uint8_t *) &(LIST_ELEM)->next     \
 		- offsetof (STRUCT, MEMBER.next)))
@@ -141,9 +140,9 @@ bool list_empty (struct list *);
 /* Miscellaneous. */
 void list_reverse (struct list *);
 
-/* Compares the value of two list elements A and B, given
-   auxiliary data AUX.  Returns true if A is less than B, or
-   false if A is greater than or equal to B. */
+/* 보조 데이터 AUX가 주어지면 두 리스트 요소 A와 B의 값을 비교한다.
+   A가 B의 값보다 작으면 true를 반환하고, A가 B보다 작으면 ture를 반환하고,
+   A가 B보다 작으면 ture를 반환하고, A가 B보다 크거나 같으면 false를 반환한다. */
 typedef bool list_less_func (const struct list_elem *a,
                              const struct list_elem *b,
                              void *aux);

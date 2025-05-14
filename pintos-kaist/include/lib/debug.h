@@ -21,8 +21,8 @@ void debug_backtrace (void);
 
 
 
-/* This is outside the header guard so that debug.h may be
- * included multiple times with different settings of NDEBUG. */
+/* 이 코드는 debug.h를 서로 다른 NDEBUG 설정으로 여러 번 포함할 수 있도록
+   헤더 가드(header guard) 바깥에 위치한다. */
 #undef ASSERT
 #undef NOT_REACHED
 

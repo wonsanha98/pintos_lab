@@ -35,8 +35,8 @@ struct gp_registers {
 } __attribute__((packed));
 
 struct intr_frame {
-	/* Pushed by intr_entry in intr-stubs.S.
-	   These are the interrupted task's saved registers. */
+	/* intr-stubs.s의 intr_entry에 의해 푸시된다.
+	   이것들은 인터럽트된 태스크의 저장된 레지스터들이다. */
 	struct gp_registers R;
 	uint16_t es;
 	uint16_t __pad1;

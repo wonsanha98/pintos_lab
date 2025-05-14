@@ -1,5 +1,5 @@
-/* Tests that the highest-priority thread waiting on a semaphore
-   is the first to wake up. */
+/* 세마포어를 기다리는 가장 높은 우선순위의 스레드가
+   가장 먼저 깨어나는지 테스트한다. */
 
 #include <stdio.h>
 #include "tests/threads/tests.h"
@@ -20,8 +20,8 @@ test_priority_sema (void)
   /* This test does not work with the MLFQS. */
   ASSERT (!thread_mlfqs);
 
-  sema_init (&sema, 0);
-  thread_set_priority (PRI_MIN);
+  sema_init (&sema, 0);             //세마포어 생성
+  thread_set_priority (PRI_MIN);    //현재 실행중인 스레드를 최소 우선순위로 만든다.
   for (i = 0; i < 10; i++) 
     {
       int priority = PRI_DEFAULT - (i + 3) % 10 - 1;

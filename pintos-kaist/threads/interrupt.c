@@ -100,7 +100,7 @@ static const char *intr_names[INTR_CNT];
    sleep, although they may invoke intr_yield_on_return() to
    request that a new process be scheduled just before the
    interrupt returns. */
-static bool in_external_intr;   /* Are we processing an external interrupt? */
+static bool in_external_intr;   /* 외부 인터럽트를 처리 중인지 true or false */
 static bool yield_on_return;    /* Should we yield on interrupt return? */
 
 /* Programmable Interrupt Controller helpers. */
@@ -110,7 +110,7 @@ static void pic_end_of_interrupt (int irq);
 /* Interrupt handlers. */
 void intr_handler (struct intr_frame *args);
 
-/* Returns the current interrupt status. */
+/* 현재 인터럽트 상태를 반환한다. */
 enum intr_level
 intr_get_level (void) {
 	uint64_t flags;
@@ -124,8 +124,8 @@ intr_get_level (void) {
 	return flags & FLAG_IF ? INTR_ON : INTR_OFF;
 }
 
-/* Enables or disables interrupts as specified by LEVEL and
-   returns the previous interrupt status. */
+/* LEVEL 값에 따라 인터럽트를 활성화하거나 비활성화하고, 
+   이전 상태를 반환함으로써, 이후 원래 상태로 복원할 수 있는 구조로 동작한다. */
 enum intr_level
 intr_set_level (enum intr_level level) {
 	return level == INTR_ON ? intr_enable () : intr_disable ();
@@ -146,7 +146,7 @@ intr_enable (void) {
 	return old_level;
 }
 
-/* Disables interrupts and returns the previous interrupt status. */
+/* 인터럽트를 비활성화하고, 이전 인터럽트 상태를 반환한다. */
 enum intr_level
 intr_disable (void) {
 	enum intr_level old_level = intr_get_level ();
@@ -252,8 +252,8 @@ intr_register_int (uint8_t vec_no, int dpl, enum intr_level level,
 	register_handler (vec_no, dpl, level, handler, name);
 }
 
-/* Returns true during processing of an external interrupt
-   and false at all other times. */
+/* 외부 인터럽트를 처리하는 중일 떄는 true를 반환하고, 
+   그 외의 모든 시간에는 false를 반환한다. */
 bool
 intr_context (void) {
 	return in_external_intr;

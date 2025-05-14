@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "thread.h": "c",
+        "tests.h": "c",
+        "synch.h": "c",
+        "list.h": "c"
+    }
+}
